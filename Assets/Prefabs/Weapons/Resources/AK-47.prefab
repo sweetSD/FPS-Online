@@ -6211,9 +6211,10 @@ MonoBehaviour:
   m_AutoReload: 1
   m_AutoReloadDelay: 0.25
   m_MaxAmmo: 10000
+  m_MaxDistance: 1000
   m_Damage: 10
   m_SpairBullet: 1
-  m_BulletForce: 400
+  m_BulletForce: 1000
   m_ShowBulletInMagDelay: 0.6
   m_BulletInMagRenderer: {fileID: 1069089986523385438}
   m_RandomMuzzleflash: 1

@@ -184,14 +184,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02ff3ea705a4a7244a59eef82e75c660, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Damage: 10
   m_DestroyAfter: 5
-  m_DestroyOnImpact: 0
+  m_DestroyOnImpact: 1
   m_DeactiveOnDestroy: 1
   m_MinDestroyTime: 0.1
   m_MaxDestroyTime: 0.2
   m_OverlapLayer:
     serializedVersion: 2
-    m_Bits: 7991
+    m_Bits: 7479
   m_ImpactPrefabs:
   - m_Key: Metal
     m_Transform: {fileID: 4458509032938956, guid: 79927c6543a058b4383885fac101fe2e,

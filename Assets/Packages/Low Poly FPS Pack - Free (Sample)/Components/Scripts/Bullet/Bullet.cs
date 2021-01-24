@@ -40,10 +40,20 @@ public class Bullet : Photon.PunBehaviour {
 
     private Gun.HitScanType m_HitScanType;
 
-	private void Start () 
-	{
-		StartCoroutine (DestroyAfter ());
-	}
+    private Rigidbody m_RigidBody;
+    private Rigidbody RigidBody
+    {
+        get
+        {
+            if (m_RigidBody == null) m_RigidBody = GetComponent<Rigidbody>();
+            return m_RigidBody;
+        }
+    }
+
+    private void OnEnable()
+    {
+        StartCoroutine(DestroyAfter());
+    }
 
     public void Initialize(Gun.HitScanType type, float dmg)
     {
@@ -54,6 +64,7 @@ public class Bullet : Photon.PunBehaviour {
     [PunRPC]
     private void Initialize_RPC(Gun.HitScanType type, float dmg)
     {
+        RigidBody.useGravity = type == Gun.HitScanType.Raycasting ? false : true;
         m_HitScanType = type;
         m_Damage = dmg;
     }
@@ -62,7 +73,7 @@ public class Bullet : Photon.PunBehaviour {
     {
         if (PhotonNetwork.isMasterClient)
         {
-            int count = Physics.OverlapBoxNonAlloc(transform.position, transform.localScale * 0.5f, m_OverlapColliders, Quaternion.LookRotation(transform.forward), m_OverlapLayer);
+            int count = Physics.OverlapBoxNonAlloc(transform.position, transform.localScale * 0.0005f, m_OverlapColliders, Quaternion.LookRotation(transform.forward), m_OverlapLayer);
             for (int i = 0; i < count; i++) CollisionCheck(m_OverlapColliders[i]);
         }
     }

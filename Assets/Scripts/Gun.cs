@@ -85,6 +85,9 @@ public class Gun : Photon.PunBehaviour, IPunObservable
     [SerializeField] protected int m_MaxAmmo;
     // 탄창을 모두 소모하였는지 여부
     protected bool m_isOutOfAmmo;
+    // 최대 거리
+    [Tooltip("무기의 최대 사정거리")]
+    [SerializeField] protected float m_MaxDistance = 1000f;
 
     [Header("Bullet Settings")]
     //Bullet
@@ -232,7 +235,7 @@ public class Gun : Photon.PunBehaviour, IPunObservable
     protected void WeaponSwayProcess()
     {
         //Weapon sway
-        if (m_WeaponSway == true)
+        if (m_WeaponSway == true && !m_isAiming)
         {
             float movementX = -Input.GetAxis("Mouse X") * m_SwayAmount;
             float movementY = -Input.GetAxis("Mouse Y") * m_SwayAmount;
@@ -247,6 +250,10 @@ public class Gun : Photon.PunBehaviour, IPunObservable
             transform.localPosition = Vector3.Lerp
                 (transform.localPosition, finalSwayPosition +
                     m_InitialSwayPosition, Time.deltaTime * m_SwaySmoothValue);
+        }
+        else
+        {
+            transform.localPosition = m_InitialSwayPosition;
         }
     }
 
@@ -435,7 +442,7 @@ public class Gun : Photon.PunBehaviour, IPunObservable
             var ray = Camera.main.ScreenPointToRay(new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit, float.MaxValue, m_RaycastLayerMask))
+            if (Physics.Raycast(ray, out hit, m_MaxDistance, m_RaycastLayerMask))
             {
                 if (hit.collider.transform.tag == "Player")
                 {
@@ -446,13 +453,17 @@ public class Gun : Photon.PunBehaviour, IPunObservable
 
             Debug.DrawRay(ray.GetPoint(0), ray.direction);
 
-            SpawnBullet(m_Spawnpoints.bulletSpawnPoint.transform.position, hit.collider != null ? hit.point : ray.direction * float.MaxValue, m_BulletForce);
+            if (m_HitScanType == HitScanType.Raycasting)
+                photonView.RPC("SpawnBullet", PhotonTargets.All, new object[] { m_Spawnpoints.bulletSpawnPoint.transform.position, hit.collider != null ? hit.point : ray.direction * 9999f, m_BulletForce });
+            else
+                SpawnBullet(m_Spawnpoints.bulletSpawnPoint.transform.position, hit.collider != null ? hit.point : ray.direction * m_MaxDistance, m_BulletForce);
 
             // 탄피 생성
             SDObjectPool.GetPool("Big_Casing").ActiveObject(m_Spawnpoints.casingSpawnPoint.transform.position, m_Spawnpoints.casingSpawnPoint.transform.rotation.eulerAngles);
         }
     }
 
+    [PunRPC]
     protected void SpawnBullet(Vector3 position, Vector3 destPosition, float velocity)
     {
         Bullet bullet;
