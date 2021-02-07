@@ -17,4 +17,12 @@ public static class SDGameObjectExtension
             else GameObject.Destroy(obj.gameObject);
         }
     }
+
+    public static void DestroyChildren(this Transform trans)
+    {
+        for(int i = trans.childCount; i >= 0; i--)
+        {
+            GameObject.Destroy(trans.GetChild(i).gameObject);
+        }
+    }
 }
