@@ -92,34 +92,37 @@ public class Bullet : Photon.PunBehaviour {
 
     private void CollisionCheck (Collider collider)
     {
-        m_ImpactPrefabs.ForEach((value) =>
+        if (m_HitScanType == Gun.HitScanType.Projectile)
         {
-            if (collider.transform.tag == value.m_Key)
+            m_ImpactPrefabs.ForEach((value) =>
             {
+                if (collider.transform.tag == value.m_Key)
+                {
                 //Instantiate(value.m_Transform, transform.position,
                 //    Quaternion.LookRotation(collider.contacts[0].normal));
                 this.Destroy(m_DeactiveOnDestroy);
+                }
+            });
+            Debug.Log(collider.transform.tag);
+
+            if (collider.transform.tag == "Player")
+            {
+                collider.transform.gameObject.GetComponent
+                    <Character>().Damage(m_Damage);
             }
-        });
-        Debug.Log(collider.transform.tag);
 
-        if (collider.transform.tag == "Player")
-        {
-            collider.transform.gameObject.GetComponent
-                <Character>().Damage(m_Damage);
-        }
+            if (collider.transform.tag == "Target")
+            {
+                collider.transform.gameObject.GetComponent
+                    <TargetScript>().isHit = true;
+            }
 
-        if (collider.transform.tag == "Target") 
-		{
-			collider.transform.gameObject.GetComponent
-				<TargetScript>().isHit = true;
+            if (collider.transform.tag == "ExplosiveBarrel")
+            {
+                collider.transform.gameObject.GetComponent
+                    <ExplosiveBarrelScript>().explode = true;
+            }
         }
-			
-		if (collider.transform.tag == "ExplosiveBarrel") 
-		{
-			collider.transform.gameObject.GetComponent
-				<ExplosiveBarrelScript>().explode = true;
-		}
 
         // 피격시 총알 오브젝트 제거
         if (!m_DestroyOnImpact)
