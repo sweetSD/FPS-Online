@@ -123,7 +123,7 @@ public class MoveController : Photon.PunBehaviour, IPunObservable
         {
             m_HitFaceNormal = hit.normal;
 
-            var slopeAngle = ((Vector3.Angle(Vector3.up, m_DirectionSlope.normalized)) - 90f);
+            var slopeAngle = Vector3.Angle(Vector3.up, m_DirectionSlope.normalized) - 90f;
 
             m_DirectionSlope = Vector3.Cross(m_HitFaceNormal, Vector3.Cross(m_HitFaceNormal, Vector3.up));
             m_DirectionSlope.Normalize();
@@ -134,7 +134,7 @@ public class MoveController : Photon.PunBehaviour, IPunObservable
             if (slopeAngle > m_SlopeLimit && m_HitFaceNormal != Vector3.up)
             {
                 var multiply = SDMath.Map(slopeAngle, m_SlopeLimit, 90, 2.5f, 7.5f);
-                if (m_SlopeVelocity.normalized != m_DirectionSlope.normalized) m_EleapsedSlopeSlide = 0.1f;
+                //if (m_SlopeVelocity.normalized != m_DirectionSlope.normalized) m_EleapsedSlopeSlide = 0.1f;
                 m_SlopeVelocity = m_DirectionSlope * m_EleapsedSlopeSlide * multiply;
                 m_EleapsedSlopeSlide += Time.deltaTime;
             }

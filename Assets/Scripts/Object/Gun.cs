@@ -261,6 +261,7 @@ public class Gun : Photon.PunBehaviour, IPunObservable
     {
         if (!photonView.isMine) return;
 
+        // 정조준 입력 프로세스
         if (Input.GetButton("Fire2") && !m_isReloading && !m_isRunning && !m_isInspecting) AimProcess();
         else AimReleaseProcess();
 
@@ -275,6 +276,7 @@ public class Gun : Photon.PunBehaviour, IPunObservable
 
         AmmoCheckProcess();
 
+        // 총 발포 입력 프로세스
         if (Input.GetMouseButton(0) && !m_isOutOfAmmo && !m_isReloading && !m_isInspecting && !m_isRunning) Fire();
 
         // T 입력시 총기 관찰 애니메이션 실행
@@ -444,19 +446,21 @@ public class Gun : Photon.PunBehaviour, IPunObservable
 
             if (Physics.Raycast(ray, out hit, m_MaxDistance, m_RaycastLayerMask))
             {
-                if (hit.collider.transform.tag == "Player")
+                if (m_HitScanType == HitScanType.Raycasting && hit.collider.transform.tag == "Player")
                 {
-                    hit.collider.transform.gameObject.GetComponent
-                        <Character>().Damage(m_Damage);
+                    var character = hit.collider.transform.gameObject.GetComponent<Character>();
+                    if (!character.photonView.isMine) character.Damage(m_Damage);
                 }
             }
 
             Debug.DrawRay(ray.GetPoint(0), ray.direction);
 
+            Vector3 destPos = hit.collider != null ? hit.point : ray.direction * m_MaxDistance;
+
             if (m_HitScanType == HitScanType.Raycasting)
-                photonView.RPC("SpawnBullet", PhotonTargets.All, new object[] { m_Spawnpoints.bulletSpawnPoint.transform.position, hit.collider != null ? hit.point : ray.direction * 9999f, m_BulletForce });
+                photonView.RPC("SpawnBullet", PhotonTargets.All, new object[] { m_Spawnpoints.bulletSpawnPoint.transform.position, destPos, m_BulletForce });
             else
-                SpawnBullet(m_Spawnpoints.bulletSpawnPoint.transform.position, hit.collider != null ? hit.point : ray.direction * m_MaxDistance, m_BulletForce);
+                SpawnBullet(m_Spawnpoints.bulletSpawnPoint.transform.position, destPos, m_BulletForce);
 
             // 탄피 생성
             SDObjectPool.GetPool("Big_Casing").ActiveObject(m_Spawnpoints.casingSpawnPoint.transform.position, m_Spawnpoints.casingSpawnPoint.transform.rotation.eulerAngles);

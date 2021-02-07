@@ -42,7 +42,7 @@ public class CameraController : Photon.PunBehaviour
     {
         if (photonView.isMine)
         {
-            Cursor.lockState = CursorLockMode.Locked;
+            //Cursor.lockState = CursorLockMode.Locked;
         }
 
         if (!photonView.isMine)
